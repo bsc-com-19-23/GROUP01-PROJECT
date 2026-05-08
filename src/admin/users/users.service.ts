@@ -41,7 +41,11 @@ export class UsersService {
   }
   // UPDATE USER
   async update(id: number, dto: UpdateUserDto) {
-    await this.repo.update(id, dto);
+    await this.repo.update(id, {
+      ...dto,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      role: dto.role ? ({ id: dto.role } as any) : undefined,
+    });
     return this.findOne(id);
   }
 
