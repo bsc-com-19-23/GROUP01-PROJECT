@@ -7,6 +7,10 @@ export class UpdateUserDto {
   @IsString()
   role?: string;
 
+  @IsOptional()
+  @IsString()
+  name?: string;
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @IsOptional()
   isActive?: boolean;

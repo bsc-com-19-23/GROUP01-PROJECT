@@ -13,15 +13,15 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const user = (await this.usersService.findByEmail(email)) as any;
-    console.log('USER FROM DB:', user); // Debug log
+    console.dir(user, { depth: null }); // Debug log
     console.log('INPUT PASSWORD:', password); // Debug log
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    console.log('HASHED PASSWORD:', user?.password); // Debug log
+    console.log('HASHED PASSWORD:', user?.passwordhash); // Debug log
 
     if (!user) throw new UnauthorizedException('User not found');
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.passwordhash);
     console.log('PASSWORD MATCH:', isMatch); // Debug log
 
     if (!isMatch) throw new UnauthorizedException('Invalid credentials');

@@ -6,11 +6,13 @@ import { UsersModule } from './admin/users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PatientsModule } from './patients/patients.module';
 import { AppointmentsModule } from './appointments/appointments.module';
-import { AuthenticationModule } from './authentication/authentication.module';
+import { StaffModule } from './staff/staff.module';
+import { recordsModule } from './records/records.module';
 
 // Explicit imports of your entities
 import { Appointment } from './appointments/Entities/appointment.entity';
-import { Patient } from './patients/patients.entity';
+import { Patient } from './entities/patients.entity';
+import { MedicalRecord } from './entities/records.entity';
 
 @Module({
   imports: [
@@ -26,13 +28,14 @@ import { Patient } from './patients/patients.entity';
       serviceName: process.env.DB_SERVICE || 'HEALTHY_PASSPORT_PDB',
       synchronize: true, // ⚠️ only for development
       logging: true,
-      entities: [User, Appointment, Patient],
+      entities: [User, MedicalRecord, Appointment, Patient],
     }),
     UsersModule,
     AuthModule,
     PatientsModule,
     AppointmentsModule,
-    AuthenticationModule,
+    StaffModule,
+    recordsModule,
   ],
 })
 export class AppModule {}
