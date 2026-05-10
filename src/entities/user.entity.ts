@@ -1,21 +1,24 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRole {
-  ADMIN = 'admin',
-  HEALTHY_OFFICER = 'healthy_officer',
-  PATIENT = 'patient',
+  ADMIN = 'ADMIN',
+  HEALTHY_OFFICER = 'HEALTHY_OFFICER',
+  PATIENT = 'PATIENT',
 }
 
-@Entity('users')
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @Column()
+  name!: string;
 
   @Column({ unique: true })
   email!: string;
 
   @Column({ select: false })
-  password!: string;
+  passwordhash!: string;
 
   @Column({ default: true })
   isActive!: boolean;

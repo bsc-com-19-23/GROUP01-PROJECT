@@ -2,10 +2,10 @@
 /dist
 /node_modules
 /build
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
+=========
 .env
-=======
->>>>>>> 7183271e08a504e801bebdfe8f429b4eb17185b9
+>>>>>>>>> Temporary merge branch 2
 
 # Logs
 logs

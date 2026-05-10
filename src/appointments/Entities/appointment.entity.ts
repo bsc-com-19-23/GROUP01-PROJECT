@@ -1,22 +1,39 @@
-import{Entity,PrimaryGeneratedColumn,Column}from 'typeorm';
+// appointments.entity.ts
+
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Patient } from '../../entities/patients.entity';
+
+import { User } from '../../entities/user.entity';
 
 @Entity('appointments')
 export class Appointment {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  patient_id: number;
+  appointmentDate!: Date;
 
   @Column()
-  staff_id: number;
+  reason!: string;
 
-  @Column({ type: 'timestamp' })
-  date_time: Date;
+  @Column({
+    default: 'PENDING',
+  })
+  status!: string;
 
   @Column()
-  status: string;
+  createdAt!: Date;
 
-  @Column({ nullable: true })
-  notes: string;
+  // =========================================
+  // PATIENT RELATION
+  // =========================================
+
+  @ManyToOne(() => Patient, (patient) => patient.appointments)
+  patient!: Patient;
+
+  // =========================================
+
+  @ManyToOne(() => User)
+  healthOfficer!: User;
 }

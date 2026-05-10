@@ -11,7 +11,7 @@ export class UsersService {
   async findByEmail(email: string) {
     return this.repo.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'role'],
+      select: ['id', 'email', 'passwordhash', 'role', 'name'],
     });
   }
   constructor(
@@ -23,8 +23,10 @@ export class UsersService {
   async create(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = this.repo.create({
+      name: dto.name,
       email: dto.email,
-      password: hashedPassword,
+      passwordhash: hashedPassword,
+      role: dto.role,
     });
 
     return this.repo.save(user);

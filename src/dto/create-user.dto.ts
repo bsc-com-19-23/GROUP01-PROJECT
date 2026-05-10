@@ -1,13 +1,26 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { UserRole } from '../entities/user.entity';
 
 export class CreateUserDto {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
+
   @IsEmail()
+  @IsNotEmpty()
   email!: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @IsString()
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  @IsNotEmpty()
   @MinLength(6)
   password!: string;
+
+  @IsEnum(UserRole)
+  role!: UserRole;
 }
