@@ -33,29 +33,19 @@ import { MedicalRecord } from './entities/records.entity';
 
       host: process.env.DB_HOST || 'localhost',
 
-      port:
-        Number(process.env.DB_PORT) || 1521,
+      port: Number(process.env.DB_PORT) || 1521,
 
-      username:
-        process.env.DB_USER || 'pdb_admin',
+      username: process.env.DB_USER || 'pdb_admin',
 
-      password:
-        process.env.DB_PASS || 'Group1',
+      password: process.env.DB_PASS || 'Group1',
 
-      serviceName:
-        process.env.DB_SERVICE ||
-        'HEALTHY_PASSPORT_PDB',
+      serviceName: process.env.DB_SERVICE || 'HEALTHY_PASSPORT_PDB',
 
       synchronize: true,
 
       logging: true,
 
-      entities: [
-        User,
-        Patient,
-        Appointment,
-        MedicalRecord,
-      ],
+      entities: [User, Patient, Appointment, MedicalRecord],
     }),
 
     AuthModule,

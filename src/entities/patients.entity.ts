@@ -1,26 +1,22 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { MedicalRecord } from './records.entity';
 
 import { Appointment } from '../appointments/Entities/appointment.entity';
 
+import { User } from './user.entity';
+
 @Entity('patients')
 export class Patient {
   @PrimaryGeneratedColumn()
   id!: number;
-
-  @Column()
-  name!: string;
-
-  @Column({ unique: true })
-  email!: string;
-
-  @Column()
-  passwordHash!: string;
-
-  // =========================================
-  // HEALTH PASSPORT INFORMATION
-  // =========================================
 
   @Column({ default: false })
   isVerified!: boolean;
@@ -35,4 +31,8 @@ export class Patient {
 
   @OneToMany(() => Appointment, (appointment) => appointment.patient)
   appointments!: Appointment[];
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user!: User;
 }

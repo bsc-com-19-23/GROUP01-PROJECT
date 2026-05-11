@@ -12,13 +12,14 @@ import { PatientsService } from './patients.service';
 import { Patient } from '../entities/patients.entity';
 
 import { MedicalRecord } from '../entities/records.entity';
+import { User } from '../entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Patient, MedicalRecord]),
+    TypeOrmModule.forFeature([Patient, MedicalRecord, User]),
 
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: 'SUPER_SECRET_KEY', //  move to .env later
       signOptions: {
         expiresIn: '1d',
       },

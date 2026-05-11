@@ -18,11 +18,16 @@ import { Patient } from '../entities/patients.entity';
 
 import { MedicalRecord } from '../entities/records.entity';
 
+import { User, UserRole } from '../entities/user.entity';
+
 @Injectable()
 export class PatientsService {
   constructor(
     @InjectRepository(Patient)
     private readonly patientRepo: Repository<Patient>,
+
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
 
     @InjectRepository(MedicalRecord)
     private readonly medicalRecordRepo: Repository<MedicalRecord>,
@@ -35,31 +40,38 @@ export class PatientsService {
   // =========================================
 
   async login(email: string, password: string) {
-    const patient = await this.patientRepo.findOne({
-      where: { email },
+    const user = await this.userRepo.findOne({
+      where: {
+        email,
+        role: UserRole.PATIENT,
+      },
+
+      select: ['id', 'name', 'email', 'passwordhash', 'role'],
     });
 
-    if (!patient) {
+    if (!user) {
       throw new NotFoundException('Patient not found');
     }
 
-    const passwordMatches = await bcrypt.compare(
-      password,
-      patient.passwordHash,
-    );
+    const passwordMatches = await bcrypt.compare(password, user.passwordhash);
 
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // =========================================
-    // GENERATE JWT TOKEN
-    // =========================================
+    const patient = await this.patientRepo.findOne({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+      relations: ['user'],
+    });
 
     const payload = {
-      sub: patient.id,
-      name: patient.name,
-      role: 'PATIENT',
+      sub: user.id,
+      name: user.name,
+      role: user.role,
     };
 
     const access_token = await this.jwtService.signAsync(payload);
@@ -68,18 +80,9 @@ export class PatientsService {
       success: true,
       message: 'Login successful',
       access_token,
-      patient: {
-        id: patient.id,
-        name: patient.name,
-        email: patient.email,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        passportStatus: patient.passportStatus,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        isVerified: patient.isVerified,
-      },
+      patient,
     };
   }
-
   // =========================================
   // VIEW PATIENT MEDICAL RECORDS
   // =========================================
@@ -95,7 +98,6 @@ export class PatientsService {
       throw new NotFoundException('Patient not found');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const medicalReports = await this.medicalRecordRepo.find({
       where: {
         patient: {

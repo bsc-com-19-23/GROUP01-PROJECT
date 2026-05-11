@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/user.entity';
+import { User, UserRole } from '../../entities/user.entity';
+import { Patient } from '../../entities/patients.entity';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -17,11 +18,15 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private repo: Repository<User>,
+    @InjectRepository(Patient)
+    private patientRepo: Repository<Patient>,
   ) {}
 
   // CREATE USER
   async create(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // CREATE USER
     const user = this.repo.create({
       name: dto.name,
       email: dto.email,
@@ -29,7 +34,17 @@ export class UsersService {
       role: dto.role,
     });
 
-    return this.repo.save(user);
+    const savedUser = await this.repo.save(user);
+
+    // CREATE PATIENT PROFILE
+    if (dto.role === UserRole.PATIENT) {
+      const patient = this.patientRepo.create({
+        user: savedUser,
+      });
+
+      await this.patientRepo.save(patient);
+    }
+    return savedUser;
   }
 
   // GET ALL USERS

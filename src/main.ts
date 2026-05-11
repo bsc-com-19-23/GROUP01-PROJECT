@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 import * as bcrypt from 'bcrypt';
@@ -10,10 +11,8 @@ import { User, UserRole } from './entities/user.entity';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // GLOBAL PREFIX
   app.setGlobalPrefix('api');
 
-  // VALIDATION
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -22,26 +21,30 @@ async function bootstrap() {
     }),
   );
 
-  // ENABLE CORS
   app.enableCors();
 
-  // DEFAULT ADMIN CREATION
+  const config = new DocumentBuilder()
+    .setTitle('Digital Health Passport API')
+    .setDescription('Digital Health Passport System')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('docs', app, document);
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const usersRepository = app.get(
-    getRepositoryToken(User),
-  );
+  const usersRepository = app.get(getRepositoryToken(User));
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const existingAdmin =
-    await usersRepository.findOne({
-      where: {
-        email: 'admin@gmail.com',
-      },
-    });
+  const existingAdmin = await usersRepository.findOne({
+    where: {
+      email: 'admin@gmail.com',
+    },
+  });
 
   if (!existingAdmin) {
-    const hashedPassword =
-      await bcrypt.hash('123456', 10);
+    const hashedPassword = await bcrypt.hash('123456', 10);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const admin = usersRepository.create({
@@ -54,9 +57,7 @@ async function bootstrap() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     await usersRepository.save(admin);
 
-    console.log(
-      'Default admin created successfully',
-    );
+    console.log('Default admin created');
   }
 
   const PORT = process.env.PORT || 3000;
@@ -64,13 +65,8 @@ async function bootstrap() {
   await app.listen(PORT);
 
   console.log(`
-=========================================
- DIGITAL HEALTH PASSPORT API RUNNING
-=========================================
-
-http://localhost:${PORT}/api
-
-=========================================
+API: http://localhost:${PORT}/api
+Docs: http://localhost:${PORT}/docs
   `);
 }
 
